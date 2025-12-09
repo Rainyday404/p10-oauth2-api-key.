@@ -101,39 +101,70 @@ Gunakan data berikut untuk pengujian di Postman:
 
 -----
 
-## DOKUMENTASI / BUKTI PENGUJIAN
+## DOKUMENTASI HASIL PENGUJIAN API
 
-Berikut adalah bukti pengujian API menggunakan Postman:
+Berikut adalah rangkuman hasil pengujian API untuk Praktikum 10 Web Service Engineering. Pengujian mencakup fitur otentikasi dan validasi hak akses (RBAC) pada operasi CRUD.
 
-### 1. Skenario Autentikasi (Login)
+### 1. Skenario Otentikasi (Authentication)
 
-| Skenario | Bukti Screenshot |
-| :--- | :--- |
-| **Login Sukses (Admin)** | ![Login Admin](evidence/login-admin-200.png) |
-| **Login Sukses (User)** | ![Login User](evidence/login-user-200.png) |
-| **Login Gagal (Password Salah)** | ![Login Gagal](evidence/login-gagal.png) |
+#### A. Login Berhasil (Role: Admin)
+* **Endpoint:** `POST /api/v1/auth/token`
+* **Hasil:** Status `200 OK`. Server berhasil memvalidasi kredensial admin dan mengembalikan *access token* serta data user dengan role admin.
 
-### 2. Skenario CREATE (POST /private)
+#### B. Login Berhasil (Role: User Biasa)
+* **Endpoint:** `POST /api/v1/auth/token`
+* **Hasil:** Status `200 OK`. Server berhasil memvalidasi kredensial user biasa dan mengembalikan *access token* dengan role user.
 
-| Skenario | Bukti Screenshot |
-| :--- | :--- |
-| **Sukses (Role Admin)** | ![Create Sukses](evidence/create-admin-sukses.png) |
-| **Gagal (Role User Biasa)** | ![Create Gagal User](evidence/create-user-gagal.png) |
-| **Gagal (Tanpa Token)** | ![Create No Token](evidence/create-no-token.png) |
+#### C. Login Gagal (Password Salah)
+* **Endpoint:** `POST /api/v1/auth/token`
+* **Hasil:** Status `401 Unauthorized`. Sistem keamanan berhasil menolak permintaan login karena password yang dikirimkan tidak sesuai.
 
-### 3. Skenario UPDATE (PUT /private/:id)
+---
 
-| Skenario | Bukti Screenshot |
-| :--- | :--- |
-| **Sukses (Role Admin)** | ![Update Sukses](evidence/update-admin-sukses.png) |
-| **Gagal (Role User Biasa)** | ![Update Gagal User](evidence/update-user-gagal.png) |
+### 2. Skenario Create Data (POST)
 
-### 4. Skenario DELETE (DELETE /private/:id)
+#### A. Admin Membuat Produk (Sukses)
+* **Endpoint:** `POST /api/v1/products/private`
+* **Auth:** Bearer Token (Admin)
+* **Hasil:** Status `201 Created`. Data produk baru berhasil ditambahkan ke database MongoDB karena token memiliki hak akses admin.
 
-| Skenario | Bukti Screenshot |
-| :--- | :--- |
-| **Sukses (Role Admin)** | ![Delete Sukses](evidence/delete-admin-sukses.png) |
-| **Gagal (Role User Biasa)** | ![Delete Gagal User](evidence/delete-user-gagal.png) |
+#### B. User Biasa Membuat Produk (Gagal - Akses Ditolak)
+* **Endpoint:** `POST /api/v1/products/private`
+* **Auth:** Bearer Token (User)
+* **Hasil:** Status `403 Forbidden`. Permintaan ditolak oleh middleware. User biasa tidak memiliki izin untuk menambahkan data.
+
+#### C. Akses Tanpa Token (Gagal)
+* **Endpoint:** `POST /api/v1/products/private`
+* **Auth:** No Auth
+* **Hasil:** Status `403 Forbidden`. Endpoint private berhasil terlindungi; permintaan tanpa token valid otomatis ditolak.
+
+---
+
+### 3. Skenario Update Data (PUT)
+
+#### A. Admin Mengupdate Produk (Sukses)
+* **Endpoint:** `PUT /api/v1/products/private/{id}`
+* **Auth:** Bearer Token (Admin)
+* **Hasil:** Status `200 OK`. Perubahan data (harga dan deskripsi) berhasil disimpan oleh admin.
+
+#### B. User Biasa Mengupdate Produk (Gagal)
+* **Endpoint:** `PUT /api/v1/products/private/{id}`
+* **Auth:** Bearer Token (User)
+* **Hasil:** Status `403 Forbidden`. Middleware berhasil mencegah user dengan role "user" untuk mengubah data produk yang ada.
+
+---
+
+### 4. Skenario Delete Data (DELETE)
+
+#### A. Admin Menghapus Produk (Sukses)
+* **Endpoint:** `DELETE /api/v1/products/private/{id}`
+* **Auth:** Bearer Token (Admin)
+* **Hasil:** Status `200 OK`. Produk berhasil dihapus sepenuhnya dari database oleh admin.
+
+#### B. User Biasa Menghapus Produk (Gagal)
+* **Endpoint:** `DELETE /api/v1/products/private/{id}`
+* **Auth:** Bearer Token (User)
+* **Hasil:** Status `403 Forbidden`. Validasi role berfungsi dengan baik; user biasa tidak diizinkan melakukan operasi penghapusan data.
 
 -----
 
