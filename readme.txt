@@ -127,4 +127,4 @@ Berikut adalah skenario yang harus diuji untuk memastikan sistem berjalan dengan
 [ ] POST Private (Token User Biasa): Harus return 403 Forbidden (Role restriction).
 [ ] POST Private (Token Admin): Harus return 201 Created.
 
-Dosen Pengampu: Muhayat, M.IT
+Dosen Pengampu: Muhayat, M.IT 
