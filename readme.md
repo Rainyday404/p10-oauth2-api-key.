@@ -4,9 +4,9 @@
 ![Express](https://img.shields.io/badge/Express-v4.18-blue.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)
 
-Proyek ini adalah implementasi RESTful API yang menerapkan standar keamanan ganda menggunakan **API Key** untuk akses publik dan **OAuth 2.0 (JWT)** untuk akses privat dengan validasi peran (Role-Based Access Control).
+Proyek ini disusun **Untuk Memenuhi Praktikum 10 Web Service Engineering**.
 
-Dibuat sebagai tugas mata kuliah Web Service Engineering.
+Aplikasi ini adalah implementasi RESTful API yang menerapkan standar keamanan ganda menggunakan **API Key** untuk akses publik dan **OAuth 2.0 (JWT)** untuk akses privat dengan validasi peran (Role-Based Access Control).
 
 ---
 
@@ -118,5 +118,3 @@ node server.js
 | **User** | `userbiasa` | `userpass` |
 
 **API Key Publik:** `API_KEY_RAIN_SECRET_123`
-
-```
