@@ -1,149 +1,124 @@
-# PRAKTIKUM #10: SIMULASI API KEY & OAUTH 2.0 (WEB SERVICE ENGINEERING)
+# Praktikum 10: Implementasi OAuth 2.0 & API Key Security
 
-Proyek ini adalah implementasi simulasi keamanan API menggunakan **Node.js**, **Express**, dan **MongoDB**. Proyek ini mendemonstrasikan dua lapisan keamanan: **API Key** untuk akses publik (Read-Only) dan **OAuth 2.0 (JWT)** untuk akses privat (CRUD) dengan otorisasi berbasis peran (Admin).
+![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)
+![Express](https://img.shields.io/badge/Express-v4.18-blue.svg)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)
 
-## SKENARIO APLIKASI
-Sistem Manajemen Produk dengan dua level akses:
-1.  **Akses Publik (API Key):** Klien hanya dapat melihat daftar produk.
-2.  **Akses Privat (OAuth 2.0/JWT):** Pengguna terotentikasi dengan peran Admin dapat menambahkan, mengedit, dan menghapus produk.
+Proyek ini adalah implementasi RESTful API yang menerapkan standar keamanan ganda menggunakan **API Key** untuk akses publik dan **OAuth 2.0 (JWT)** untuk akses privat dengan validasi peran (Role-Based Access Control).
 
-## TOOLS ATAU ALAT
-* **Backend:** Node.js & Express.js
-* **Database:** MongoDB Atlas (Mongoose ODM)
-* **Autentikasi:** JSON Web Tokens (JWT) & API Key
-* **Keamanan:** bcryptjs untuk hashing password
-* **Tools:** Postman/Insomnia untuk pengujian
+Dibuat sebagai tugas mata kuliah Web Service Engineering.
 
-## STRUKTUR PROYEK
+---
+
+## 👤 Identitas Pengembang
+* **Nama:** Ivan Dwika Bagaskara (Rain)
+* **NIM:** 230104040205
+* **Topik:** Keamanan Web Service (API Key & JWT)
+
+---
+
+## 🚀 Fitur Utama
+1.  **Public Access (API Key):** Endpoint `GET` produk dilindungi oleh API Key fisik.
+2.  **Authentication (JWT):** Login user menggunakan username & password (terenkripsi `bcrypt`) untuk mendapatkan Token JWT.
+3.  **Authorization (RBAC):**
+    * **Admin:** Akses penuh (Create, Read, Update, Delete).
+    * **User Biasa:** Hanya akses Read, dilarang mengubah data (Forbidden 403).
+4.  **Database Seeding:** Script otomatis untuk mengisi data awal.
+5.  **Cloud Database:** Terintegrasi dengan MongoDB Atlas.
+
+---
+
+## 📂 Struktur Folder
 ```text
-p10-oauth2-api-key-nimanda/
-├── controllers/      # Logika handler (Auth & Product)
-├── middleware/       # Validasi API Key & Token JWT
-├── models/           # Skema Mongoose (User, Product, ApiKey)
-├── routes/           # Definisi endpoint API
-├── seeders/          # Script inisialisasi data awal
-├── utils/            # Fungsi utilitas (Generate Token)
-├── evidence/         # Bukti screenshot pengujian
-├── .env              # Variabel lingkungan (Credentials)
-├── package.json      # Dependencies
-└── server.js         # Entry point aplikasi
-````
+p10-oauth2-api-key/
+├── controllers/      # Logika bisnis (Auth & Product)
+├── evidence/         # Bukti screenshot pengujian (Test Evidence)
+├── middleware/       # Satpam (Validate Token & API Key)
+├── models/           # Skema Database (User, Product, ApiKey)
+├── routes/           # Definisi Endpoint API
+├── seeders/          # Script pengisi data awal
+├── utils/            # Fungsi bantuan (Token Generator)
+├── .env              # Variabel lingkungan (Local only)
+├── server.js         # Entry point aplikasi
+└── package.json      # Daftar dependency
 
-## CARA INSTALASI & MENJALANKAN
-
-### 1\. Prasyarat
-
-Pastikan Anda telah menginstal Node.js dan memiliki akun MongoDB Atlas.
-
-### 2\. Instalasi Dependencies
-
-Jalankan perintah berikut di terminal root proyek:
-
-```bash
-npm init -y
-npm install express mongoose dotenv bcryptjs jsonwebtoken
 ```
 
-### 3\. Konfigurasi Lingkungan (.env)
+---
 
-Buat file `.env` di root folder dan isi dengan konfigurasi berikut (gunakan kredensial database Anda sendiri):
+## 📸 Bukti Pengujian (Test Evidence)
+
+Berikut adalah daftar skenario pengujian yang telah dilakukan dan buktinya tersimpan dalam folder `/evidence`:
+
+### 1. Otentikasi (Auth)
+
+| Skenario | Status Code | Bukti Gambar |
+| --- | --- | --- |
+| **Login Admin** | `200 OK` | `evidence/login-admin-200.png` |
+| **Login User Biasa** | `200 OK` | `evidence/login-user-200.png` |
+| **Login Gagal** (Password Salah) | `401 Unauthorized` | `evidence/login-gagal.png` |
+
+### 2. Manajemen Produk (CRUD & RBAC)
+
+| Skenario | Aktor | Hasil | Bukti Gambar |
+| --- | --- | --- | --- |
+| **Create Product** | Admin | **Sukses** | `evidence/create-admin-sukses.png` |
+| **Create Product** | User | **Gagal (403)** | `evidence/create-user-gagal.png` |
+| **Create Product** | Anonim | **Gagal (403)** | `evidence/create-no-token.png` |
+| **Update Product** | Admin | **Sukses** | `evidence/update-admin-sukses.png` |
+| **Update Product** | User | **Gagal (403)** | `evidence/update-user-gagal.png` |
+| **Delete Product** | Admin | **Sukses** | `evidence/delete-admin-sukses.png` |
+| **Delete Product** | User | **Gagal (403)** | `evidence/delete-user-gagal.png` |
+
+---
+
+## ⚙️ Cara Instalasi & Menjalankan
+
+### 1. Install Dependencies
+
+```bash
+npm install
+
+```
+
+### 2. Konfigurasi Environment (.env)
+
+Buat file `.env` dan sesuaikan dengan kredensial MongoDB Atlas Anda:
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<dbname>?retryWrites=true&w=majority
-JWT_SECRET=rahasia-super-aman-simulasi-jwt
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=rahasia-super-aman-simulasi-jwt-rain
+
 ```
 
-### 4\. Database Seeding (Data Awal)
+### 3. Database Seeding
 
-Sebelum menjalankan server, isi database dengan data awal (User, Produk, dan API Key) menggunakan script seeder:
+Jalankan perintah ini untuk me-reset dan mengisi data awal:
 
 ```bash
 node seeders/seed.js
+
 ```
 
-*Pastikan output menunjukkan "Proses Seeding Database Berhasil\!".*
-
-### 5\. Menjalankan Server
-
-Jalankan server aplikasi:
+### 4. Jalankan Server
 
 ```bash
 node server.js
+
 ```
 
-Server akan berjalan di `http://localhost:3000`
-
------
-
-## KREDENSIAL PENGUJIAN (SEEDER DATA)
-
-Gunakan data berikut untuk pengujian di Postman:
-
-**1. User Admin**
-
-  * Username: `admin`
-  * Password: `password123`
-  * Role: `admin`
-  * Keterangan: Bisa melakukan CRUD (POST, PUT, DELETE)
-
-**2. User Biasa**
-
-  * Username: `userbiasa`
-  * Password: `userpass`
-  * Role: `user`
-  * Keterangan: Hanya bisa Login, tidak bisa CRUD
-
-**3. API Key**
-
-  * Key: `PRACTICUM_API_KEY_A_1234567890`
-  * Keterangan: Masukkan di Header `x-api-key`
-
------
-
-## DOKUMENTASI HASIL PENGUJIAN API
-
-Berikut adalah rangkuman hasil pengujian API untuk Praktikum 10 Web Service Engineering dalam format tabel.
-
-### 1. Skenario Otentikasi (Authentication)
-
-| No | Skenario Pengujian | Endpoint | Hasil Status | Analisis Singkat |
-| :-- | :--- | :--- | :--- | :--- |
-| 1 | **Login Berhasil (Admin)** | `POST /api/v1/auth/token` | `200 OK` | Server memvalidasi kredensial admin dan mengembalikan *access token* dengan role admin. |
-| 2 | **Login Berhasil (User)** | `POST /api/v1/auth/token` | `200 OK` | Server memvalidasi kredensial user biasa dan mengembalikan *access token* dengan role user. |
-| 3 | **Login Gagal** | `POST /api/v1/auth/token` | `401 Unauthorized` | Sistem keamanan berhasil menolak permintaan login karena password/username salah. |
-
 ---
 
-### 2. Skenario Create Data (POST)
+## 🧪 Akun Pengujian
 
-| No | Skenario Pengujian | Auth / Role | Hasil Status | Analisis Singkat |
-| :-- | :--- | :--- | :--- | :--- |
-| 1 | **Admin Membuat Produk** | Bearer Token (Admin) | `201 Created` | Data produk baru berhasil ditambahkan ke database karena user memiliki hak akses Admin. |
-| 2 | **User Membuat Produk** | Bearer Token (User) | `403 Forbidden` | Permintaan ditolak. User biasa tidak memiliki izin (*permission*) untuk menambahkan data. |
-| 3 | **Akses Tanpa Token** | Tidak Ada (No Auth) | `403 Forbidden` | Endpoint private terlindungi dengan baik; permintaan tanpa token valid otomatis ditolak. |
+| Role | Username | Password |
+| --- | --- | --- |
+| **Admin** | `admin` | `password123` |
+| **User** | `userbiasa` | `userpass` |
 
----
+**API Key Publik:** `API_KEY_RAIN_SECRET_123`
 
-### 3. Skenario Update Data (PUT)
+```
 
-| No | Skenario Pengujian | Auth / Role | Hasil Status | Analisis Singkat |
-| :-- | :--- | :--- | :--- | :--- |
-| 1 | **Admin Mengupdate Produk** | Bearer Token (Admin) | `200 OK` | Perubahan data (harga/deskripsi) berhasil disimpan ke database oleh Admin. |
-| 2 | **User Mengupdate Produk** | Bearer Token (User) | `403 Forbidden` | Middleware berhasil mencegah user dengan role "user" untuk mengubah data produk. |
-
----
-
-### 4. Skenario Delete Data (DELETE)
-
-| No | Skenario Pengujian | Auth / Role | Hasil Status | Analisis Singkat |
-| :-- | :--- | :--- | :--- | :--- |
-| 1 | **Admin Menghapus Produk** | Bearer Token (Admin) | `200 OK` | Data produk berhasil dihapus sepenuhnya dari database oleh Admin. |
-| 2 | **User Menghapus Produk** | Bearer Token (User) | `403 Forbidden` | Validasi role berfungsi; user biasa tidak diizinkan melakukan operasi penghapusan data. |
------
-
-**Dosen Pengampu:** Muhayat, M.IT
-
-````
-
----
+```
